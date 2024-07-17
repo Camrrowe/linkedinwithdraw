@@ -1,0 +1,45 @@
+let stopFlag = false; // Define a global stop flag
+
+async function withdrawAllInvitations(maxWithdrawals = 100) {
+    try {
+        const withdrawButtons = document.querySelectorAll('button[aria-label^="Withdraw invitation sent to"]');
+        let withdrawalsCount = 0;
+
+        if (withdrawButtons.length === 0) {
+            console.log('No withdraw buttons found.');
+            return;
+        }
+
+        for (const button of withdrawButtons) {
+            if (withdrawalsCount >= maxWithdrawals || stopFlag) break;
+
+            console.log('Clicking withdraw button...');
+            button.click();
+            
+            // Wait for the dialog to appear, with some variability
+            await new Promise(resolve => setTimeout(resolve, 500 + Math.random() * 1000));
+
+            const confirmButton = [...document.querySelectorAll('.artdeco-modal__confirm-dialog-btn')].find(btn => 
+                btn.querySelector('span')?.innerText.includes('Withdraw')
+            );
+
+            if (confirmButton) {
+                console.log('Clicking confirm button...');
+                confirmButton.click();
+                withdrawalsCount++;
+                
+                // Wait for the dialog to be processed, with some variability
+                await new Promise(resolve => setTimeout(resolve, 500 + Math.random() * 1000));
+            } else {
+                console.log('Confirm button not found.');
+            }
+        }
+
+        console.log(`Withdrawn ${withdrawalsCount} invitations`);
+    } catch (error) {
+        console.error('An error occurred:', error);
+    }
+}
+
+// Run the function with max 100 withdrawals
+withdrawAllInvitations(100);
